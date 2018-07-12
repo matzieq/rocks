@@ -11,6 +11,7 @@ var BULLET_LIFE = 60;
 var NUMBER_ASTEROIDS = 10;
 var ASTEROID_SPEED = 100;
 
+
 var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.CANVAS, "kibel",
 	{preload: preload, create: create, update: update});
 
@@ -79,6 +80,11 @@ function update () {
 	moveShip();
 	moveBullet();
 	moveRocks();
+	game.physics.arcade.collide(bullets, asteroids, null, function (bullet, asteroid) {
+		//bullet.destroy();
+		asteroid.kill();
+		bullet.kill();
+	}, this);
 }
 
 function moveShip () {
@@ -86,9 +92,9 @@ function moveShip () {
 	ship.body.acceleration.set(0);
 	wrap(ship);
 	if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
-		ship.body.angularVelocity = -200;
+		ship.body.angularVelocity = -SHIP_ROTATION_SPEED;
 	} else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
-		ship.body.angularVelocity = +200;
+		ship.body.angularVelocity = +SHIP_ROTATION_SPEED;
 	} 
 
 	if (game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
@@ -107,6 +113,7 @@ function fire () {
 		var bullet = game.add.sprite(startX, startY, "Bullet");
 		game.physics.enable(bullet, Phaser.Physics.ARCADE);
 		bullet.anchor.setTo(0.5);
+		bullet.body.immovable = true;
 		bullet.angle = ship.angle;
 		bullet.lifeSpan = BULLET_LIFE;
 		game.physics.arcade.velocityFromRotation(ship.rotation, BULLET_SPEED, bullet.body.velocity);
